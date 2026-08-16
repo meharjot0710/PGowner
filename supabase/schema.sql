@@ -262,71 +262,72 @@ ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "public_read_verified" ON properties FOR SELECT TO anon USING (verification_status = 'verified');
 
 -- RLS Policies: Owner can access all data for their properties
+-- Note: WITH CHECK clause is required for INSERT operations to work correctly
 CREATE POLICY "owner_properties" ON properties FOR ALL USING (owner_id = auth.uid());
 
-CREATE POLICY "owner_rooms" ON rooms FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_rooms" ON rooms FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_beds" ON beds FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_beds" ON beds FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_tenants" ON tenants FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_tenants" ON tenants FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_payments" ON payments FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_payments" ON payments FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_rent_collection" ON rent_collection FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_rent_collection" ON rent_collection FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_complaints" ON complaints FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_complaints" ON complaints FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_visitors" ON visitors FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_visitors" ON visitors FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_expenses" ON expenses FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_expenses" ON expenses FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_announcements" ON announcements FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_announcements" ON announcements FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_activity_log" ON activity_log FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_activity_log" ON activity_log FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_settings" ON settings FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_settings" ON settings FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_checkout_records" ON checkout_records FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_checkout_records" ON checkout_records FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_checkout_messages" ON checkout_messages FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_checkout_messages" ON checkout_messages FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "tenant_checkout_messages" ON checkout_messages FOR ALL USING (
-  tenant_id IN (SELECT id FROM tenants WHERE user_id = auth.uid())
-);
+CREATE POLICY "tenant_checkout_messages" ON checkout_messages FOR ALL 
+  USING (tenant_id IN (SELECT id FROM tenants WHERE user_id = auth.uid()))
+  WITH CHECK (tenant_id IN (SELECT id FROM tenants WHERE user_id = auth.uid()));
 
-CREATE POLICY "owner_bed_transfers" ON bed_transfers FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_bed_transfers" ON bed_transfers FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
-CREATE POLICY "owner_transactions" ON transactions FOR ALL USING (
-  property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid())
-);
+CREATE POLICY "owner_transactions" ON transactions FOR ALL 
+  USING (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()))
+  WITH CHECK (property_id IN (SELECT id FROM properties WHERE owner_id = auth.uid()));
 
 
 -- RLS Policies: Authenticated users can browse verified properties (for tenant onboarding)

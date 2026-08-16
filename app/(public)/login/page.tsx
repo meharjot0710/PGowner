@@ -17,7 +17,7 @@ export default function LoginPage() {
 
 function LoginContent() {
   const { t } = useLanguage();
-  const { signIn, signUp, isAuthenticated, loading } = useAuth();
+  const { signIn, signUp, resetPassword, isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -31,6 +31,9 @@ function LoginContent() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [signUpSuccess, setSignUpSuccess] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -308,7 +311,11 @@ function LoginContent() {
                   <input type="checkbox" className={`w-4 h-4 rounded border-slate-300 ${isOwner ? "text-blue-600 focus:ring-blue-500" : "text-emerald-600 focus:ring-emerald-500"}`} />
                   <span className="text-sm text-slate-600">{t("login.remember")}</span>
                 </label>
-                <button type="button" className={`text-sm font-medium ${isOwner ? "text-blue-600 hover:text-blue-700" : "text-emerald-600 hover:text-emerald-700"}`}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowForgotPassword(true)}
+                  className={`text-sm font-medium ${isOwner ? "text-blue-600 hover:text-blue-700" : "text-emerald-600 hover:text-emerald-700"}`}
+                >
                   {t("login.forgot")}
                 </button>
               </div>
@@ -363,6 +370,84 @@ function LoginContent() {
           )}
         </div>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowForgotPassword(false)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Reset Password</h3>
+            <p className="text-sm text-slate-500 mb-4">
+              Enter your email address and we'll send you a link to reset your password.
+            </p>
+            
+            {resetSuccess ? (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4">
+                <p className="text-sm text-emerald-700 font-medium">Check your email!</p>
+                <p className="text-sm text-emerald-600 mt-1">
+                  We've sent a password reset link to your email address.
+                </p>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 mb-4"
+                />
+                {error && (
+                  <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2 mb-4">
+                    {error}
+                  </p>
+                )}
+              </>
+            )}
+            
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setResetEmail("");
+                  setResetSuccess(false);
+                  setError("");
+                }}
+                className="flex-1 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+              >
+                Close
+              </button>
+              {!resetSuccess && (
+                <button
+                  onClick={async () => {
+                    setError("");
+                    if (!resetEmail) {
+                      setError("Please enter your email address");
+                      return;
+                    }
+                    setSubmitting(true);
+                    const result = await resetPassword(resetEmail);
+                    setSubmitting(false);
+                    if (result.error) {
+                      setError(result.error);
+                    } else {
+                      setResetSuccess(true);
+                    }
+                  }}
+                  disabled={submitting}
+                  className="flex-1 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl transition-all disabled:opacity-50"
+                >
+                  {submitting ? "Sending..." : "Send Reset Link"}
+                </button>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 }

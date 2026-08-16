@@ -21,6 +21,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string, role: AuthRole) => Promise<{ error?: string; needsVerification?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error?: string; success?: boolean }>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -30,6 +31,7 @@ const AuthContext = createContext<AuthContextType>({
   signUp: async () => ({}),
   signIn: async () => ({}),
   signOut: async () => {},
+  resetPassword: async () => ({}),
 });
 
 function mapUser(supaUser: User): AuthUser {
@@ -69,9 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name: string, role: AuthRole) => {
-    const redirectUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback`
-      : "http://localhost:3000/auth/callback";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+    const redirectUrl = `${appUrl}/auth/callback`;
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -127,8 +128,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const resetPassword = useCallback(async (email: string) => {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+    const redirectUrl = `${appUrl}/auth/callback?reset=true`;
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
+    
+    if (error) return { error: error.message };
+    return { success: true };
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, user, loading, signUp, signIn, signOut, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
